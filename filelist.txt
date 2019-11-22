@@ -1,0 +1,12 @@
+.
+├── cli
+│   ├── cli.go
+│   ├── cli_test.go
+│   └── output.go
+├── filelist.txt
+├── GoFileWatcher
+├── go.mod
+├── go.sum
+└── main.go
+
+1 directory, 8 files
