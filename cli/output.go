@@ -23,5 +23,7 @@ func DisplayEvent(event watcher.Event) {
 		fmt.Println(Colorize(event.String(), GreenFg))
 	case watcher.Remove:
 		fmt.Println(Colorize(event.String(), RedFg))
+	case watcher.Rename, watcher.Chmod, watcher.Move, watcher.Write:
+		fmt.Println(Colorize(event.String(), WhiteFg))
 	}
 }
