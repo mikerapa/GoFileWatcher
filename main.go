@@ -12,7 +12,7 @@ import (
 func main() {
 	commandLineSettings, err := cli.GetCommandLineSettings(os.Args[1:])
 	if err!=nil {
-		log.Fatal(err) // TODO: Replace with another way to show error message
+		log.Fatal(err)
 		return
 	}
 
@@ -23,7 +23,7 @@ func main() {
 		for {
 			select {
 			case event := <-w.Event:
-				//fmt.Println(event) // Print the event's info.
+				// Print out the event to the screen.
 				cli.DisplayEvent(event)
 			case err := <-w.Error:
 				log.Fatalln(err)
@@ -35,16 +35,23 @@ func main() {
 
 	// add watchers
 	for _, folderPath:= range commandLineSettings.FolderPaths{
-		if watcherAddError:= w.Add(folderPath); watcherAddError!= nil {
-			log.Fatal(watcherAddError)
+		if commandLineSettings.Recursive {
+			if watcherAddError:= w.AddRecursive(folderPath); watcherAddError!= nil {
+				log.Fatal(watcherAddError)
+			}
+		} else {
+			if watcherAddError:= w.Add(folderPath); watcherAddError!= nil {
+				log.Fatal(watcherAddError)
+			}
 		}
+
 	}
 
 	cli.DisplayWatchedFolderList(w)
 	fmt.Println()
 
 
-	// Start the watching process - it'll check for changes every 100ms.
+	// Start the watcher
 	if err := w.Start(time.Millisecond * 100); err != nil {
 		log.Fatalln(err)
 	}

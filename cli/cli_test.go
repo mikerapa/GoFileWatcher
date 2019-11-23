@@ -15,7 +15,7 @@ func Test_getCommandLineSettings(t *testing.T) {
 	}{
 		{"1 path, no Recursive", "-p /usr/mgr", CommandLineSettings{FolderPaths: []string{"/usr/mgr"}, Recursive: true}, false},
 		{"1 path with spaces", "-p /usr/mgr ", CommandLineSettings{FolderPaths: []string{"/usr/mgr"}, Recursive: true}, false},
-		{"1 path, Recursive false", "-p /usr/mgr --no-Recursive", CommandLineSettings{FolderPaths: []string{"/usr/mgr"}, Recursive: false}, false},
+		{"1 path, Recursive false", "-p /usr/mgr --no-recursive--no-recursive", CommandLineSettings{FolderPaths: []string{"/usr/mgr"}, Recursive: false}, false},
 		{"2 paths", "-p /usr/mgr;home/user1/folder2", CommandLineSettings{FolderPaths: []string{"/usr/mgr", "home/user1/folder2"}, Recursive: true}, false},
 		{"0 paths", "-p", CommandLineSettings{FolderPaths: []string{""}, Recursive: true}, true},
 		{"1 path semicolon at the end", "-p /usr/mgr;", CommandLineSettings{FolderPaths: []string{"/usr/mgr"}, Recursive: true}, false},

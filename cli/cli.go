@@ -14,7 +14,7 @@ func GetCommandLineSettings(commandLineArgs []string) (settings CommandLineSetti
 	app := kingpin.New("GoFileWatcher", "File Watcher")
 	var (
 		pathsString = app.Flag("paths", "List of paths separated by semicolons.").Short('p').Required().String()
-		recursive = app.Flag("Recursive", "[True] or [False] indicating if the folders under the supplied path should be watched. (Default True)").Short('r').Default("true").Bool()
+		recursive = app.Flag("recursive", "By default, the watcher is recursive. Use --no-recursive to make the watcher non-recursive.").Short('r').Default("true").Bool()
 	)
 
 	_, err = app.Parse(trimArray(commandLineArgs))
