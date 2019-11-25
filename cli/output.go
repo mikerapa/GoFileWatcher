@@ -1,18 +1,30 @@
 package cli
 
 import (
-	"fmt"
+	"github.com/logrusorgru/aurora"
 	. "github.com/logrusorgru/aurora"
+	"github.com/mattn/go-colorable"
+	"github.com/mattn/go-isatty"
 	"github.com/radovskyb/watcher"
+	"log"
+	"os"
 )
+// colorizer
+var au aurora.Aurora
 
+func init() {
+	// create colorizer and set the output of log
+	au = aurora.NewAurora(isatty.IsTerminal(os.Stdout.Fd()))
+	log.SetFlags(log.Flags() &^ (log.Ldate | log.Ltime))
+	log.SetOutput(colorable.NewColorableStdout())
+}
 
 func DisplayWatchedFolderList(w *watcher.Watcher){
 	// Print a list of all of the folders currently being watched.
-	fmt.Println(Colorize("Watching the following folders:", GreenFg))
+	log.Println(Colorize("Watching the following folders:", GreenFg))
 	for path, f := range w.WatchedFiles() {
 		if f.IsDir() {
-			fmt.Println(Colorize(path, WhiteFg))
+			log.Printf("%v", Colorize(path, WhiteFg))
 		}
 	}
 }
@@ -20,10 +32,10 @@ func DisplayWatchedFolderList(w *watcher.Watcher){
 func DisplayEvent(event watcher.Event) {
 	switch event.Op {
 	case watcher.Create:
-		fmt.Println(Colorize(event.String(), GreenFg))
+		log.Println(Colorize(event.String(), GreenFg))
 	case watcher.Remove:
-		fmt.Println(Colorize(event.String(), RedFg))
+		log.Println(Colorize(event.String(), RedFg))
 	case watcher.Rename, watcher.Chmod, watcher.Move, watcher.Write:
-		fmt.Println(Colorize(event.String(), WhiteFg))
+		log.Println(Colorize(event.String(), WhiteFg))
 	}
 }
