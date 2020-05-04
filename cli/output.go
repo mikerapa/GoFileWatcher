@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 )
+
 // colorizer
 var au aurora.Aurora
 
@@ -19,13 +20,22 @@ func init() {
 	log.SetOutput(colorable.NewColorableStdout())
 }
 
-func DisplayWatchedFolderList(w *watcher.Watcher){
+func DisplayWatchedFolderList(w *watcher.Watcher) {
 	// Print a list of all of the folders currently being watched.
 	log.Println(Colorize("Watching the following folders:", GreenFg))
 	for path, f := range w.WatchedFiles() {
 		if f.IsDir() {
 			log.Printf("%v", Colorize(path, WhiteFg))
 		}
+	}
+}
+
+func DisplayEventPause(pauseStatus bool) {
+	if pauseStatus {
+		log.Println(Colorize("Events", WhiteFg), Colorize("Paused", RedFg))
+	} else {
+		log.Println(Colorize("Events", WhiteFg), Colorize("Resumed", GreenFg))
+
 	}
 }
 
