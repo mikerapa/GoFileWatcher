@@ -2,27 +2,20 @@ package cli
 
 import (
 	"GoFileWatcher/fileWatcher"
-	"github.com/logrusorgru/aurora"
 	. "github.com/logrusorgru/aurora"
 	"github.com/mattn/go-colorable"
-	"github.com/mattn/go-isatty"
 	"github.com/radovskyb/watcher"
 	"log"
-	"os"
 )
 
-// colorizer
-var au aurora.Aurora
-
 func init() {
-	// create colorizer and set the output of log
-	au = aurora.NewAurora(isatty.IsTerminal(os.Stdout.Fd()))
+	// create colorize and set the output of log
 	log.SetFlags(log.Flags() &^ (log.Ldate | log.Ltime))
 	log.SetOutput(colorable.NewColorableStdout())
 }
 
-func recursiveBoolToString(recurisve bool) string {
-	if recurisve {
+func recursiveBoolToString(recursive bool) string {
+	if recursive {
 		return "Recursive"
 	} else {
 		return "Not Recursive"

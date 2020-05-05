@@ -28,8 +28,12 @@ func main() {
 		for {
 			select {
 			case folderToAdd := <-addChannel:
-				watchMan.AddFolder(folderToAdd.Path, folderToAdd.Recursive)
-				cli.DisplayFolderAdded(folderToAdd.Path, folderToAdd.Recursive)
+				err := watchMan.AddFolder(folderToAdd.Path, folderToAdd.Recursive)
+				if err == nil {
+					cli.DisplayFolderAdded(folderToAdd.Path, folderToAdd.Recursive)
+				} else {
+					cli.DisplayError(err)
+				}
 			case event := <-watchMan.Watcher.Event:
 				// Print out the event to the screen.
 				if !paused {
@@ -52,7 +56,10 @@ func main() {
 
 	// add watchers from the command line
 	for _, folderPath := range commandLineSettings.FolderPaths {
-		watchMan.AddFolder(folderPath, commandLineSettings.Recursive)
+		if err := watchMan.AddFolder(folderPath, commandLineSettings.Recursive); err != nil {
+			// Just display the error and move on
+			cli.DisplayError(err)
+		}
 	}
 
 	cli.DisplayWatchedFolderList(watchMan.FolderList)

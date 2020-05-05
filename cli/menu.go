@@ -21,8 +21,8 @@ func AddFolderMenu() (folderPath string, recursive bool, err error) {
 
 	pathPrompt := promptui.Prompt{Label: "Enter Path", Validate: validate}
 
-	// set up recusivePrompt to ask user if the new folder will be recursive
-	recusivePrompt := promptui.Select{
+	// set up recursivePrompt to ask user if the new folder will be recursive
+	recursivePrompt := promptui.Select{
 		Label: "Select Day",
 		Items: []string{"Recursive", "Not Recursive"},
 	}
@@ -33,7 +33,7 @@ func AddFolderMenu() (folderPath string, recursive bool, err error) {
 		fmt.Printf("Prompt failed %v\n", err)
 		return
 	}
-	_, result, err := recusivePrompt.Run()
+	_, result, err := recursivePrompt.Run()
 	recursive = result != "Not Recursive"
 
 	fmt.Printf("You choose %q\n", result)
@@ -52,7 +52,9 @@ func RunMenu2(pauseChannel chan bool, exitChannel chan bool, addChannel chan fil
 		if nothingToWatch {
 			println("No paths are being watched")
 		} else {
-			reader.ReadString('\n')
+			if _, err := reader.ReadString('\n'); err != nil {
+				DisplayError(err)
+			}
 			nothingToWatch = false
 			paused = true
 		}

@@ -6,29 +6,18 @@ import (
 
 func TestWatchManager_AddRemoveFolder(t *testing.T) {
 	watchMan := NewWatchManager()
+	var err error
 
 	// try to add folders
-	watchMan.AddFolder("/base/f1", true)
-	if len(watchMan.FolderList) != 1 {
-		t.Error("Folder was not added")
-	}
-
-	// try to add a second folder
-	watchMan.AddFolder("base/f2", false)
-	if len(watchMan.FolderList) != 2 {
+	err = watchMan.AddFolder(".", true)
+	if len(watchMan.FolderList) != 1 || err != nil {
 		t.Error("Folder was not added")
 	}
 
 	// remove one folder
-	watchMan.RemoveFolder("/base/f1")
-	if len(watchMan.FolderList) != 1 {
-		t.Error("Folder was not added")
-	}
-
-	// Remove second folder
-	watchMan.RemoveFolder("base/f2")
-	if len(watchMan.FolderList) != 0 {
-		t.Error("Folder was not added")
+	err = watchMan.RemoveFolder(".")
+	if len(watchMan.FolderList) != 0 || err != nil {
+		t.Error("Folder was not removed")
 	}
 
 }
@@ -41,8 +30,9 @@ func TestWatchManager_AddFolder(t *testing.T) {
 		wantErr   bool
 	}{
 		{name: "empty path", path: "", recursive: false, wantErr: true},
-		{name: "Add a path recursive", path: "/home/path", recursive: true, wantErr: false},
-		{name: "Add a path recursive", path: "/home/path2", recursive: true, wantErr: false},
+		{name: "a path that does not exist", path: "/home/path", recursive: true, wantErr: true},
+		{name: "Add a path recursive", path: "./", recursive: true, wantErr: false},
+		{name: "Add a path non-recursive", path: ".", recursive: true, wantErr: false},
 	}
 	for _, tt := range tests {
 		watchMan := NewWatchManager()
@@ -51,7 +41,8 @@ func TestWatchManager_AddFolder(t *testing.T) {
 			if err := watchMan.AddFolder(tt.path, true); (err != nil) != tt.wantErr {
 				t.Errorf("AddFolder() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			if watchMan.FolderList[tt.path].Recursive != tt.recursive {
+			// if this scenario should generate an error, skip the check for the recursive flag
+			if !tt.wantErr && watchMan.FolderList[tt.path].Recursive != tt.recursive {
 				t.Error("AddFolder() recursive flag not set correctly")
 			}
 		})

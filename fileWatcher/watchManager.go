@@ -25,9 +25,14 @@ func (wm *WatchManager) AddFolder(path string, recursive bool) (err error) {
 	}
 	newFolder := &Folder{Path: path, Recursive: recursive}
 	if recursive {
-		wm.Watcher.AddRecursive(path)
+		err = wm.Watcher.AddRecursive(path)
 	} else {
-		wm.Watcher.Add(path)
+		err = wm.Watcher.Add(path)
+	}
+
+	// only add the folder to the list if it was added to the watcher
+	if err != nil {
+		return err
 	}
 	wm.FolderList[path] = *newFolder
 	return
