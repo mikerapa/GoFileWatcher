@@ -2,8 +2,8 @@ package main
 
 import (
 	"GoFileWatcher/cli"
+	"GoFileWatcher/fileWatcher"
 	"fmt"
-	"github.com/radovskyb/watcher"
 	"log"
 	"os"
 	"time"
@@ -17,84 +17,56 @@ func main() {
 		return
 	}
 
-	w := watcher.New()
-
+	watchMan := fileWatcher.NewWatchManager()
 	paused := false
 
 	pauseChannel := make(chan bool)
 	exitChannel := make(chan bool)
+	addChannel := make(chan fileWatcher.Folder)
 
 	go func() {
 		for {
 			select {
-			case event := <-w.Event:
+			case folderToAdd := <-addChannel:
+				watchMan.AddFolder(folderToAdd.Path, folderToAdd.Recursive)
+				cli.DisplayFolderAdded(folderToAdd.Path, folderToAdd.Recursive)
+			case event := <-watchMan.Watcher.Event:
 				// Print out the event to the screen.
 				if !paused {
 					cli.DisplayEvent(event)
 				}
-			case err := <-w.Error:
+			case err := <-watchMan.Watcher.Error:
 				log.Fatalln(err)
-			case <-w.Closed:
+			case <-watchMan.Watcher.Closed:
 				return
+
 			case p := <-pauseChannel:
 				paused = p
-				println("paused", paused)
 			case <-exitChannel:
-				ExitApplication(w)
+				ExitApplication(watchMan)
 			}
 		}
 	}()
 
-	go cli.RunMenu(pauseChannel, exitChannel)
-	//// keyboard listen loop
-	//reader := bufio.NewReader(os.Stdin)
-	//go func (reader *bufio.Reader, w *watcher.Watcher){
-	//	for {
-	//		text, _ := reader.ReadString('\n')
-	//		if len(text)>0{
-	//			println("text", text)
-	//
-	//		}
-	//		paused = !paused
-	//		cli.DisplayEventPause(paused)
-	//		if paused{
-	//			exitApplication := cli.MainMenu()
-	//			if exitApplication{
-	//				ExitApplication(w)
-	//			} else {
-	//				paused = false
-	//				cli.DisplayEventPause(paused)
-	//			}
-	//		}
-	//	}
-	//}(reader, w)
+	go cli.RunMenu2(pauseChannel, exitChannel, addChannel, len(commandLineSettings.FolderPaths) == 0)
 
-	// add watchers
+	// add watchers from the command line
 	for _, folderPath := range commandLineSettings.FolderPaths {
-		if commandLineSettings.Recursive {
-			if watcherAddError := w.AddRecursive(folderPath); watcherAddError != nil {
-				log.Fatal(watcherAddError)
-			}
-		} else {
-			if watcherAddError := w.Add(folderPath); watcherAddError != nil {
-				log.Fatal(watcherAddError)
-			}
-		}
-
+		watchMan.AddFolder(folderPath, commandLineSettings.Recursive)
 	}
 
-	cli.DisplayWatchedFolderList(w)
+	cli.DisplayWatchedFolderList(watchMan.FolderList)
 	fmt.Println()
 
 	// Start the watcher
-	if err := w.Start(time.Millisecond * 100); err != nil {
+	if err := watchMan.Watcher.Start(time.Millisecond * 100); err != nil {
 		log.Fatalln(err)
 	}
 }
 
 //Shut down the application
-func ExitApplication(w *watcher.Watcher) {
+func ExitApplication(watchMan *fileWatcher.WatchManager) {
 	println("Shutting down File Watcher")
-	w.Close()
+	watchMan.Close()
 	os.Exit(0)
 }

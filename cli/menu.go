@@ -1,20 +1,61 @@
 package cli
 
 import (
+	"GoFileWatcher/fileWatcher"
 	"bufio"
+	"errors"
 	"fmt"
 	"github.com/manifoldco/promptui"
 	"os"
 )
 
-func MainMenu() (exitApplication bool) {
+func AddFolderMenu() (folderPath string, recursive bool, err error) {
+
+	// Set up prompt for asking the user for a folder path
+	validate := func(inputPath string) error {
+		if !fileWatcher.IsValidDirPath(inputPath) {
+			return errors.New("invalid path")
+		}
+		return nil
+	}
+
+	pathPrompt := promptui.Prompt{Label: "Enter Path", Validate: validate}
+
+	// set up recusivePrompt to ask user if the new folder will be recursive
+	recusivePrompt := promptui.Select{
+		Label: "Select Day",
+		Items: []string{"Recursive", "Not Recursive"},
+	}
+
+	folderPath, err = pathPrompt.Run()
+
+	if err != nil {
+		fmt.Printf("Prompt failed %v\n", err)
+		return
+	}
+	_, result, err := recusivePrompt.Run()
+	recursive = result != "Not Recursive"
+
+	fmt.Printf("You choose %q\n", result)
+	return
+}
+
+func RunMenu2(pauseChannel chan bool, exitChannel chan bool, addChannel chan fileWatcher.Folder, nothingToWatch bool) {
+	paused := false
+
 	prompt := promptui.Select{
 		Label: "Main menu",
 		Items: []string{"Add folder", "List folders", "Remove folder", "Resume watch", "Exit"},
 	}
-	// TODO add menu option for pause and unpause
-	//exitMenu := false
+	reader := bufio.NewReader(os.Stdin)
 	for {
+		if nothingToWatch {
+			println("No paths are being watched")
+		} else {
+			reader.ReadString('\n')
+			nothingToWatch = false
+			paused = true
+		}
 		_, result, err := prompt.Run()
 		if err != nil {
 			fmt.Printf("Prompt failed %v\n", err)
@@ -23,39 +64,22 @@ func MainMenu() (exitApplication bool) {
 
 		switch result {
 		case "Add folder":
+			folderPath, recursive, err := AddFolderMenu()
+			if err != nil {
+				DisplayError(err)
+			}
+			addChannel <- fileWatcher.Folder{Path: folderPath, Recursive: recursive}
 		case "List folders":
 		case "Remove folder":
 		case "Resume watch":
-			return false
+			paused = false
+			pauseChannel <- false
+			DisplayEventPause(paused)
 		case "Exit":
-			return true
+			exitChannel <- true
 		default:
 
 		}
-		//fmt.Printf("You choose %q\n", result)
-	}
-	return
-}
 
-// Start the menu system and listen for the Enter key
-func RunMenu(pauseChannel chan bool, exitChannel chan bool) {
-	paused := false
-	reader := bufio.NewReader(os.Stdin)
-	for {
-		reader.ReadString('\n')
-		paused = !paused
-		pauseChannel <- paused
-		DisplayEventPause(paused)
-
-		if paused {
-			exitApplication := MainMenu()
-			if exitApplication {
-				exitChannel <- true
-			} else {
-				// when exiting the main menu, anything but the exit application option should resume the file watching
-				paused = false
-				DisplayEventPause(paused)
-			}
-		}
 	}
 }

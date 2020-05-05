@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"GoFileWatcher/fileWatcher"
 	"github.com/logrusorgru/aurora"
 	. "github.com/logrusorgru/aurora"
 	"github.com/mattn/go-colorable"
@@ -20,13 +21,27 @@ func init() {
 	log.SetOutput(colorable.NewColorableStdout())
 }
 
-func DisplayWatchedFolderList(w *watcher.Watcher) {
+func recursiveBoolToString(recurisve bool) string {
+	if recurisve {
+		return "Recursive"
+	} else {
+		return "Not Recursive"
+	}
+}
+
+func DisplayError(err error) {
+	log.Println(Colorize("Error:", RedFg), Colorize(err.Error(), WhiteFg))
+}
+
+func DisplayFolderAdded(path string, recursive bool) {
+	log.Printf("Now watching %v (%v)", Colorize(path, WhiteFg), Colorize(recursiveBoolToString(recursive), YellowFg))
+}
+
+func DisplayWatchedFolderList(folderList map[string]fileWatcher.Folder) {
 	// Print a list of all of the folders currently being watched.
 	log.Println(Colorize("Watching the following folders:", GreenFg))
-	for path, f := range w.WatchedFiles() {
-		if f.IsDir() {
-			log.Printf("%v", Colorize(path, WhiteFg))
-		}
+	for _, f := range folderList {
+		log.Printf("%v (%v)", Colorize(f.Path, WhiteFg), Colorize(recursiveBoolToString(f.Recursive), YellowFg))
 	}
 }
 
