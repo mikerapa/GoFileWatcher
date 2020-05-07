@@ -9,11 +9,28 @@ import (
 	"os"
 )
 
+func RemoveFolderMenu(folderList map[string]fileWatcher.Folder) (folderPath string, err error) {
+	//items := []string{}
+	var items []string
+
+	for folder := range folderList {
+		items = append(items, folder)
+	}
+	removeFolderPrompt := promptui.Select{
+		Label: "Remove Folder",
+		Items: items,
+	}
+
+	_, folderPath, err = removeFolderPrompt.Run()
+
+	return
+}
+
 func AddFolderMenu() (folderPath string, recursive bool, err error) {
 
 	// Set up prompt for asking the user for a folder path
 	validate := func(inputPath string) error {
-		if !fileWatcher.IsValidDirPath(inputPath) {
+		if len(inputPath) > 0 && !fileWatcher.IsValidDirPath(inputPath) {
 			return errors.New("invalid path")
 		}
 		return nil
@@ -28,7 +45,10 @@ func AddFolderMenu() (folderPath string, recursive bool, err error) {
 	}
 
 	folderPath, err = pathPrompt.Run()
-
+	// If the user entered an empty folder path, get out of the AddFolderMenu
+	if len(folderPath) == 0 {
+		return
+	}
 	if err != nil {
 		fmt.Printf("Prompt failed %v\n", err)
 		return
@@ -40,7 +60,7 @@ func AddFolderMenu() (folderPath string, recursive bool, err error) {
 	return
 }
 
-func RunMenu2(pauseChannel chan bool, exitChannel chan bool, addChannel chan fileWatcher.Folder, nothingToWatch bool) {
+func RunMenu(pauseChannel chan bool, exitChannel chan bool, watchMan *fileWatcher.WatchManager) {
 	paused := false
 
 	prompt := promptui.Select{
@@ -49,13 +69,12 @@ func RunMenu2(pauseChannel chan bool, exitChannel chan bool, addChannel chan fil
 	}
 	reader := bufio.NewReader(os.Stdin)
 	for {
-		if nothingToWatch {
-			println("No paths are being watched")
+		if len(watchMan.FolderList) == 0 {
+			println("No paths are being watched") // TODO change this to a method in output
 		} else {
 			if _, err := reader.ReadString('\n'); err != nil {
 				DisplayError(err)
 			}
-			nothingToWatch = false
 			paused = true
 		}
 		_, result, err := prompt.Run()
@@ -68,11 +87,32 @@ func RunMenu2(pauseChannel chan bool, exitChannel chan bool, addChannel chan fil
 		case "Add folder":
 			folderPath, recursive, err := AddFolderMenu()
 			if err != nil {
+				DisplayError(err) // if there's an error from AddFolderMenu, get out
+				continue
+			}
+			// Make sure there is a folder path to add
+			if len(folderPath) == 0 {
+				DisplayUserMessage("No folders added")
+				continue
+			}
+			err = watchMan.AddFolder(folderPath, recursive)
+			if err == nil {
+				DisplayFolderAdded(folderPath, recursive)
+			} else {
 				DisplayError(err)
 			}
-			addChannel <- fileWatcher.Folder{Path: folderPath, Recursive: recursive}
 		case "List folders":
+			DisplayWatchedFolderList(watchMan.FolderList)
 		case "Remove folder":
+			folderPath, err := RemoveFolderMenu(watchMan.FolderList)
+			if err == nil {
+				err = watchMan.RemoveFolder(folderPath)
+				if err != nil {
+					DisplayError(err)
+				}
+			} else {
+				DisplayError(err)
+			}
 		case "Resume watch":
 			paused = false
 			pauseChannel <- false

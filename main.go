@@ -22,18 +22,14 @@ func main() {
 
 	pauseChannel := make(chan bool)
 	exitChannel := make(chan bool)
-	addChannel := make(chan fileWatcher.Folder)
+	/*	addChannel := make(chan fileWatcher.Folder)
+		removeChannel := make(chan fileWatcher.Folder)
+		listChannel := make(chan bool)*/
 
 	go func() {
 		for {
 			select {
-			case folderToAdd := <-addChannel:
-				err := watchMan.AddFolder(folderToAdd.Path, folderToAdd.Recursive)
-				if err == nil {
-					cli.DisplayFolderAdded(folderToAdd.Path, folderToAdd.Recursive)
-				} else {
-					cli.DisplayError(err)
-				}
+
 			case event := <-watchMan.Watcher.Event:
 				// Print out the event to the screen.
 				if !paused {
@@ -52,7 +48,7 @@ func main() {
 		}
 	}()
 
-	go cli.RunMenu2(pauseChannel, exitChannel, addChannel, len(commandLineSettings.FolderPaths) == 0)
+	go cli.RunMenu(pauseChannel, exitChannel, watchMan)
 
 	// add watchers from the command line
 	for _, folderPath := range commandLineSettings.FolderPaths {

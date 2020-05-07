@@ -30,6 +30,10 @@ func DisplayFolderAdded(path string, recursive bool) {
 	log.Printf("Now watching %v (%v)", Colorize(path, WhiteFg), Colorize(recursiveBoolToString(recursive), YellowFg))
 }
 
+func DisplayUserMessage(message string) {
+	log.Println(Colorize(message, WhiteFg))
+}
+
 func DisplayWatchedFolderList(folderList map[string]fileWatcher.Folder) {
 	// Print a list of all of the folders currently being watched.
 	log.Println(Colorize("Watching the following folders:", GreenFg))
