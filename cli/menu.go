@@ -70,7 +70,7 @@ func RunMenu(pauseChannel chan bool, exitChannel chan bool, watchMan *fileWatche
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		if len(watchMan.FolderList) == 0 {
-			println("No paths are being watched") // TODO change this to a method in output
+			DisplayUserMessage("No paths are being watched")
 		} else {
 			if _, err := reader.ReadString('\n'); err != nil {
 				DisplayError(err)
@@ -79,7 +79,7 @@ func RunMenu(pauseChannel chan bool, exitChannel chan bool, watchMan *fileWatche
 		}
 		_, result, err := prompt.Run()
 		if err != nil {
-			fmt.Printf("Prompt failed %v\n", err)
+			DisplayError(err)
 			return
 		}
 
