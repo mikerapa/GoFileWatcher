@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/radovskyb/watcher"
 	"strings"
+	"time"
 )
 
 type WatchManager struct {
@@ -41,6 +42,11 @@ func (wm *WatchManager) AddFolder(path string, recursive bool) (err error) {
 // End the watching for all folders
 func (wm *WatchManager) Close() {
 	wm.Watcher.Close()
+}
+
+func (wm *WatchManager) Start() (err error){
+	err = wm.Watcher.Start(time.Second * 1)
+	return
 }
 
 func (wm *WatchManager) RemoveFolder(path string) (err error) {

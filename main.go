@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"time"
 )
 
 func main() {
@@ -60,7 +59,7 @@ func main() {
 	fmt.Println()
 
 	// Start the watcher
-	if err := watchMan.Watcher.Start(time.Millisecond * 100); err != nil {
+	if err := watchMan.Start(); err != nil {
 		log.Fatalln(err)
 	}
 }
