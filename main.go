@@ -47,11 +47,13 @@ func main() {
 				return
 
 			case p := <-pauseChannel:
-				paused = p
+				// React to changes in the paused status
+				if paused != p {
+					paused = p
+					cli.DisplayEventPause(paused)
+				}
 			case <-exitChannel:
 				wg.Done()
-				//ExitApplication(watcher, &wg)
-
 
 			}
 		}

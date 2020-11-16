@@ -61,7 +61,6 @@ func AddFolderMenu() (folderPath string, recursive bool, err error) {
 }
 
 func RunMenu(pauseChannel chan bool, exitChannel chan bool, watcher *folderWatcher.Watcher) {
-	paused := false
 	// TODO events are still displayed even when the menu is displayed
 	prompt := promptui.Select{
 		Label: "Main menu",
@@ -75,7 +74,7 @@ func RunMenu(pauseChannel chan bool, exitChannel chan bool, watcher *folderWatch
 			if _, err := reader.ReadString('\n'); err != nil {
 				DisplayError(err)
 			}
-			paused = true
+			pauseChannel<-true
 		}
 		_, result, err := prompt.Run()
 		if err != nil {
@@ -115,9 +114,7 @@ func RunMenu(pauseChannel chan bool, exitChannel chan bool, watcher *folderWatch
 				DisplayError(err)
 			}
 		case "Resume watch":
-			paused = false
 			pauseChannel <- false
-			DisplayEventPause(paused)
 		case "Exit":
 			exitChannel <- true
 		default:
