@@ -6,11 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/manifoldco/promptui"
+	"github.com/mikerapa/FolderWatcher"
 	"os"
 )
 
-func RemoveFolderMenu(folderList map[string]fileWatcher.Folder) (folderPath string, err error) {
-	//items := []string{}
+func RemoveFolderMenu(folderList map[string]folderWatcher.WatchRequest) (folderPath string, err error) {
 	var items []string
 
 	for folder := range folderList {
@@ -60,16 +60,16 @@ func AddFolderMenu() (folderPath string, recursive bool, err error) {
 	return
 }
 
-func RunMenu(pauseChannel chan bool, exitChannel chan bool, watchMan *fileWatcher.WatchManager) {
+func RunMenu(pauseChannel chan bool, exitChannel chan bool, watcher *folderWatcher.Watcher) {
 	paused := false
-
+	// TODO events are still displayed even when the menu is displayed
 	prompt := promptui.Select{
 		Label: "Main menu",
 		Items: []string{"Add folder", "List folders", "Remove folder", "Resume watch", "Exit"},
 	}
 	reader := bufio.NewReader(os.Stdin)
 	for {
-		if len(watchMan.FolderList) == 0 {
+		if len(watcher.RequestedWatches) == 0 {
 			DisplayUserMessage("No paths are being watched")
 		} else {
 			if _, err := reader.ReadString('\n'); err != nil {
@@ -95,18 +95,19 @@ func RunMenu(pauseChannel chan bool, exitChannel chan bool, watchMan *fileWatche
 				DisplayUserMessage("No folders added")
 				continue
 			}
-			err = watchMan.AddFolder(folderPath, recursive)
+			// TODO the showHidden value is hard-coded
+			err = watcher.AddFolder(folderPath, recursive, false)
 			if err == nil {
 				DisplayFolderAdded(folderPath, recursive)
 			} else {
 				DisplayError(err)
 			}
 		case "List folders":
-			DisplayWatchedFolderList(watchMan.FolderList)
+			DisplayWatchedFolderList(watcher.RequestedWatches)
 		case "Remove folder":
-			folderPath, err := RemoveFolderMenu(watchMan.FolderList)
+			folderPath, err := RemoveFolderMenu(watcher.RequestedWatches)
 			if err == nil {
-				err = watchMan.RemoveFolder(folderPath)
+				err = watcher.RemoveFolder(folderPath, true)
 				if err != nil {
 					DisplayError(err)
 				}
