@@ -61,7 +61,6 @@ func AddFolderMenu() (folderPath string, recursive bool, err error) {
 }
 
 func RunMenu(pauseChannel chan bool, exitChannel chan bool, watcher *folderWatcher.Watcher) {
-	// TODO events are still displayed even when the menu is displayed
 	prompt := promptui.Select{
 		Label: "Main menu",
 		Items: []string{"Add folder", "List folders", "Remove folder", "Resume watch", "Exit"},

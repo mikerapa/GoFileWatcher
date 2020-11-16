@@ -2,7 +2,7 @@
 
 GoFileWatcher is a command line utility for monitoring file changes. 
 If you are looking for a go library for use within another application, see 
-github.com/radovskyb/watcher, on which this application is based. 
+https://github.com/mikerapa/FolderWatcher. 
 
 ## Usage
 
@@ -25,23 +25,34 @@ Command line flags
                      make the watcher non-recursive.`
                      
 ### Menu System
-The main menu is displayed when the application is first started, unless a path
-is passed in as a flag. 
+If application starts with a folder path specified on command line, the application will start watching
+the specified folder without displaying the main menu. The main menu will display if a path has not been 
+provided. You can return to the main menu by pressing Enter at any time. File events are not displayed
+while the menu is active.
+
 
 ![Main Menu](./images/mainmenu.png "Main Menu")
 
-**Add Folder:** Add a folder to the list of folders being watched
+| Action | Description |
+| ------- | -------|
+| Add Folder | specify a folder path to watch |
+| List Folders | see a list of folders the application is watching |
+| Remove Folder | choose a folder path to stop watching |
+| Resume Watch | Exit the main menu and return to viewing file events |
+| Exit | Quit the application |
 
-**List Folders:** Show a list of folders currently being watched
-
-**Remove Folder:** See a list of folders currently watched and select one to remove
-from the list and stop watching. 
-
-**Resume Watch:** Exit the main menu and return to viewing file events
-
-**Exit:** Quit the application 
 
 ### Output 
+// TODO need to update this image
+
 ![Main Menu](./images/listevents.png "Main Menu")
 
 While watching folders, add, delete and update events are captured.
+
+## Knows Limitations
+1. Hidden files are not tracked. 
+2. Files moved from a watched folder to an unwatched folder will be recorded as a Remove event.
+
+## Future development 
+- [ ] Hidden File - Add the ability to track events for hidden files. 
+
