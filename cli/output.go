@@ -52,15 +52,16 @@ func DisplayEventPause(pauseStatus bool) {
 }
 
 func DisplayEvent(event folderWatcher.FileEvent) {
+	displayText := Sprintf("%s - %s", event.FileChange, event.Description)
 	switch event.FileChange {
 
 	case folderWatcher.Add:
-		log.Println(Colorize(event.Description, GreenFg))
+		log.Println(Colorize(displayText, GreenFg))
 	case folderWatcher.Remove:
-		log.Println(Colorize(event.Description, RedFg))
+		log.Println(Colorize(displayText, RedFg))
 	case folderWatcher.Write:
-		log.Println(Colorize(event.Description, WhiteFg))
+		log.Println(Colorize(displayText, WhiteFg))
 	case folderWatcher.Move:
-		log.Println(Colorize(event.Description, BlueFg))
+		log.Println(Colorize(displayText, BlueFg))
 	}
 }

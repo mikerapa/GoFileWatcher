@@ -3,9 +3,9 @@ package main
 import (
 	"GoFileWatcher/cli"
 	"fmt"
+	FolderWatcher "github.com/mikerapa/FolderWatcher"
 	"log"
 	"os"
-	FolderWatcher "github.com/mikerapa/FolderWatcher"
 	"sync"
 )
 
