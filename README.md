@@ -56,3 +56,14 @@ While watching folders, add, delete and update events are captured.
 ## Future development 
 - [ ] Hidden File - Add the ability to track events for hidden files. 
 
+## Attributions 
+
+The menus are built using the promptui package. 
+Copyright (c) 2017, Arigato Machine Inc. All rights reserved. Seee https://github.com/manifoldco/promptui
+for more details.
+
+The Aurora package is used to produce the color output. See https://github.com/logrusorgru/aurora.
+
+This application uses the Kinpin package for dealing with command line arguments. 
+github.com/alecthomas/kingpin
+
