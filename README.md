@@ -25,7 +25,7 @@ Command line flags
                      make the watcher non-recursive.`
                      
 ### Menu System
-If application starts with a folder path specified on command line, the application will start watching
+If the application starts with a folder path specified on command line, the application will start watching
 the specified folder without displaying the main menu. The main menu will display if a path has not been 
 provided. You can return to the main menu by pressing Enter at any time. File events are not displayed
 while the menu is active.
@@ -43,27 +43,24 @@ while the menu is active.
 
 
 ### Output 
-// TODO need to update this image
+GoFileWatcher captures add, delete, move and update events.
 
 ![Main Menu](./images/listevents.png "Main Menu")
 
-While watching folders, add, delete and update events are captured.
 
-## Knows Limitations
+
+## Known Limitations
 1. Hidden files are not tracked. 
 2. Files moved from a watched folder to an unwatched folder will be recorded as a Remove event.
+3. In Windows, some move events from one watched folder to another watched folder will be represented 
+   as a Remove and an Add event.
 
 ## Future development 
 - [ ] Hidden File - Add the ability to track events for hidden files. 
 
-## Attributions 
+## Building from Code
+This application requires go version 1.15 or higher. 
 
-The menus are built using the promptui package. 
-Copyright (c) 2017, Arigato Machine Inc. All rights reserved. Seee https://github.com/manifoldco/promptui
-for more details.
+Download the latest code from https://github.com/mikerapa/GoFileWatcher/releases/. 
 
-The Aurora package is used to produce the color output. See https://github.com/logrusorgru/aurora.
-
-This application uses the Kinpin package for dealing with command line arguments. 
-github.com/alecthomas/kingpin
-
+Run `go build`

@@ -23,8 +23,6 @@ github.com/lunixbochs/vtclean v0.0.0-20180621232353-2d01aacdc34a h1:weJVJJRzAJBF
 github.com/lunixbochs/vtclean v0.0.0-20180621232353-2d01aacdc34a/go.mod h1:pHhQNgMf3btfWnGBVipUOjRYhoOsdGqdm/+2c2E2WMI=
 github.com/manifoldco/promptui v0.7.0 h1:3l11YT8tm9MnwGFQ4kETwkzpAwY2Jt9lCrumCUW4+z4=
 github.com/manifoldco/promptui v0.7.0/go.mod h1:n4zTdgP0vr0S3w7/O/g98U+e0gwLScEXGwov2nIKuGQ=
-github.com/manifoldco/promptui v0.8.0 h1:R95mMF+McvXZQ7j1g8ucVZE1gLP3Sv6j9vlF9kyRqQo=
-github.com/manifoldco/promptui v0.8.0/go.mod h1:n4zTdgP0vr0S3w7/O/g98U+e0gwLScEXGwov2nIKuGQ=
 github.com/mattn/go-colorable v0.0.9/go.mod h1:9vuHe8Xs5qXnSaW/c/ABM9alt+Vo+STaOChaDxuIBZU=
 github.com/mattn/go-colorable v0.1.4 h1:snbPLB8fVfU9iwbbo30TPtbLRzwWu6aJS6Xh4eaaviA=
 github.com/mattn/go-colorable v0.1.4/go.mod h1:U0ppj6V5qS13XJ6of8GYAs25YV2eR4EVcfRqFIhoBtE=
@@ -33,10 +31,6 @@ github.com/mattn/go-isatty v0.0.8 h1:HLtExJ+uU2HOZ+wI0Tt5DtUDrx8yhUqDcp7fYERX4CE
 github.com/mattn/go-isatty v0.0.8/go.mod h1:Iq45c/XA43vh69/j3iqttzPXn0bhXyGjM0Hdxcsrc5s=
 github.com/mikerapa/FolderWatcher v0.0.0-20201115215114-22637e75e788 h1:LANeVaYwCYPY2A3ZeFISPZCQ7gffKwxMZ/HgyBXvM6k=
 github.com/mikerapa/FolderWatcher v0.0.0-20201115215114-22637e75e788/go.mod h1:YCcE5aixRPOWrh4AVPJGOhhuAFBFp7LnOfMHOlDzBm4=
-github.com/mikerapa/FolderWatcher v0.0.0-20201126193832-3b28b3c2c5ee h1:ADdYJRC+pPcbwQRaPaCv3mz5sJyZxnHu+dwmnDs8D5k=
-github.com/mikerapa/FolderWatcher v0.0.0-20201126193832-3b28b3c2c5ee/go.mod h1:YCcE5aixRPOWrh4AVPJGOhhuAFBFp7LnOfMHOlDzBm4=
-github.com/mikerapa/FolderWatcher v0.0.0-20201129151939-e604da9f1b9c h1:2vigJlqFylZKP20uT9Tu7HAGcSIRMun5rLZzIoj9teQ=
-github.com/mikerapa/FolderWatcher v0.0.0-20201129151939-e604da9f1b9c/go.mod h1:YCcE5aixRPOWrh4AVPJGOhhuAFBFp7LnOfMHOlDzBm4=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/radovskyb/watcher v1.0.7 h1:AYePLih6dpmS32vlHfhCeli8127LzkIgwJGcwwe8tUE=
