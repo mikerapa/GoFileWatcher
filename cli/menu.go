@@ -67,7 +67,7 @@ func RunMenu(pauseChannel chan bool, exitChannel chan bool, watcher *folderWatch
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		if len(watcher.RequestedWatches) == 0 {
-			DisplayUserMessage("No paths are being watched")
+			DisplayUserMessage("No folders are being watched")
 		} else {
 			if _, err := reader.ReadString('\n'); err != nil {
 				DisplayError(err)
@@ -104,6 +104,11 @@ func RunMenu(pauseChannel chan bool, exitChannel chan bool, watcher *folderWatch
 			DisplayWatchedFolderList(watcher.RequestedWatches)
 			pauseChannel <- false
 		case "Remove folder":
+			if len(watcher.RequestedWatches)==0{
+				// if there are no folders watched, do not call the RemoveFolderMenu
+				continue
+			}
+
 			folderPath, err := RemoveFolderMenu(watcher.RequestedWatches)
 			if err == nil {
 				err = watcher.RemoveFolder(folderPath, true)
