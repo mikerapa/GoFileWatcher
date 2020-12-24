@@ -40,7 +40,7 @@ func AddFolderMenu() (folderPath string, recursive bool, err error) {
 
 	// set up recursivePrompt to ask user if the new folder will be recursive
 	recursivePrompt := promptui.Select{
-		Label: "Select Day",
+		Label: "Recursion",
 		Items: []string{"Recursive", "Not Recursive"},
 	}
 
@@ -56,7 +56,6 @@ func AddFolderMenu() (folderPath string, recursive bool, err error) {
 	_, result, err := recursivePrompt.Run()
 	recursive = result != "Not Recursive"
 
-	fmt.Printf("You choose %q\n", result)
 	return
 }
 
@@ -100,18 +99,23 @@ func RunMenu(pauseChannel chan bool, exitChannel chan bool, watcher *folderWatch
 			} else {
 				DisplayError(err)
 			}
+			pauseChannel <- false
 		case "List folders":
 			DisplayWatchedFolderList(watcher.RequestedWatches)
+			pauseChannel <- false
 		case "Remove folder":
 			folderPath, err := RemoveFolderMenu(watcher.RequestedWatches)
 			if err == nil {
 				err = watcher.RemoveFolder(folderPath, true)
 				if err != nil {
 					DisplayError(err)
+
 				}
 			} else {
 				DisplayError(err)
 			}
+			pauseChannel<- false
+
 		case "Resume watch":
 			pauseChannel <- false
 		case "Exit":
