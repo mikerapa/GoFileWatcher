@@ -21,7 +21,7 @@ Command line flags
                      
   `-p, --paths=PATHS  List of paths separated by semicolons.`
   
-  `-r, --recursive    By default, the watcher is recursive. Use --no-recursive to
+  `-r, --recursive    By default, the watcher is recursive. Use -recursive=false to
                      make the watcher non-recursive.`
                      
 ### Menu System
