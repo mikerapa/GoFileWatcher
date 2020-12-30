@@ -6,11 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/manifoldco/promptui"
+	"github.com/mikerapa/FolderWatcher"
 	"os"
 )
 
-func RemoveFolderMenu(folderList map[string]fileWatcher.Folder) (folderPath string, err error) {
-	//items := []string{}
+func RemoveFolderMenu(folderList map[string]folderWatcher.WatchRequest) (folderPath string, err error) {
 	var items []string
 
 	for folder := range folderList {
@@ -40,7 +40,7 @@ func AddFolderMenu() (folderPath string, recursive bool, err error) {
 
 	// set up recursivePrompt to ask user if the new folder will be recursive
 	recursivePrompt := promptui.Select{
-		Label: "Select Day",
+		Label: "Recursion",
 		Items: []string{"Recursive", "Not Recursive"},
 	}
 
@@ -56,26 +56,23 @@ func AddFolderMenu() (folderPath string, recursive bool, err error) {
 	_, result, err := recursivePrompt.Run()
 	recursive = result != "Not Recursive"
 
-	fmt.Printf("You choose %q\n", result)
 	return
 }
 
-func RunMenu(pauseChannel chan bool, exitChannel chan bool, watchMan *fileWatcher.WatchManager) {
-	paused := false
-
+func RunMenu(pauseChannel chan bool, exitChannel chan bool, watcher *folderWatcher.Watcher) {
 	prompt := promptui.Select{
 		Label: "Main menu",
 		Items: []string{"Add folder", "List folders", "Remove folder", "Resume watch", "Exit"},
 	}
 	reader := bufio.NewReader(os.Stdin)
 	for {
-		if len(watchMan.FolderList) == 0 {
-			DisplayUserMessage("No paths are being watched")
+		if len(watcher.RequestedWatches) == 0 {
+			DisplayUserMessage("No folders are being watched")
 		} else {
 			if _, err := reader.ReadString('\n'); err != nil {
 				DisplayError(err)
 			}
-			paused = true
+			pauseChannel<-true
 		}
 		_, result, err := prompt.Run()
 		if err != nil {
@@ -95,28 +92,37 @@ func RunMenu(pauseChannel chan bool, exitChannel chan bool, watchMan *fileWatche
 				DisplayUserMessage("No folders added")
 				continue
 			}
-			err = watchMan.AddFolder(folderPath, recursive)
+			// TODO the showHidden value is hard-coded
+			err = watcher.AddFolder(folderPath, recursive, false)
 			if err == nil {
 				DisplayFolderAdded(folderPath, recursive)
 			} else {
 				DisplayError(err)
 			}
+			pauseChannel <- false
 		case "List folders":
-			DisplayWatchedFolderList(watchMan.FolderList)
+			DisplayWatchedFolderList(watcher.RequestedWatches)
+			pauseChannel <- false
 		case "Remove folder":
-			folderPath, err := RemoveFolderMenu(watchMan.FolderList)
+			if len(watcher.RequestedWatches)==0{
+				// if there are no folders watched, do not call the RemoveFolderMenu
+				continue
+			}
+
+			folderPath, err := RemoveFolderMenu(watcher.RequestedWatches)
 			if err == nil {
-				err = watchMan.RemoveFolder(folderPath)
+				err = watcher.RemoveFolder(folderPath, true)
 				if err != nil {
 					DisplayError(err)
+
 				}
 			} else {
 				DisplayError(err)
 			}
+			pauseChannel<- false
+
 		case "Resume watch":
-			paused = false
 			pauseChannel <- false
-			DisplayEventPause(paused)
 		case "Exit":
 			exitChannel <- true
 		default:

@@ -1,10 +1,9 @@
 package cli
 
 import (
-	"GoFileWatcher/fileWatcher"
 	. "github.com/logrusorgru/aurora"
 	"github.com/mattn/go-colorable"
-	"github.com/radovskyb/watcher"
+	"github.com/mikerapa/FolderWatcher"
 	"log"
 )
 
@@ -34,12 +33,13 @@ func DisplayUserMessage(message string) {
 	log.Println(Colorize(message, WhiteFg))
 }
 
-func DisplayWatchedFolderList(folderList map[string]fileWatcher.Folder) {
+func DisplayWatchedFolderList(folderList map[string]folderWatcher.WatchRequest) {
 	// Print a list of all of the folders currently being watched.
 	log.Println(Colorize("Watching the following folders:", GreenFg))
 	for _, f := range folderList {
 		log.Printf("%v (%v)", Colorize(f.Path, WhiteFg), Colorize(recursiveBoolToString(f.Recursive), YellowFg))
 	}
+	// TODO this does not show the showHidden value
 }
 
 func DisplayEventPause(pauseStatus bool) {
@@ -51,13 +51,17 @@ func DisplayEventPause(pauseStatus bool) {
 	}
 }
 
-func DisplayEvent(event watcher.Event) {
-	switch event.Op {
-	case watcher.Create:
-		log.Println(Colorize(event.String(), GreenFg))
-	case watcher.Remove:
-		log.Println(Colorize(event.String(), RedFg))
-	case watcher.Rename, watcher.Chmod, watcher.Move, watcher.Write:
-		log.Println(Colorize(event.String(), WhiteFg))
+func DisplayEvent(event folderWatcher.FileEvent) {
+	displayText := Sprintf("%s - %s", event.FileChange, event.Description)
+	switch event.FileChange {
+
+	case folderWatcher.Add:
+		log.Println(Colorize(displayText, GreenFg))
+	case folderWatcher.Remove:
+		log.Println(Colorize(displayText, RedFg))
+	case folderWatcher.Write:
+		log.Println(Colorize(displayText, WhiteFg))
+	case folderWatcher.Move:
+		log.Println(Colorize(displayText, BlueFg))
 	}
 }

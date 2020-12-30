@@ -2,21 +2,22 @@ package main
 
 import (
 	"GoFileWatcher/cli"
-	"GoFileWatcher/fileWatcher"
 	"fmt"
+	FolderWatcher "github.com/mikerapa/FolderWatcher"
 	"log"
 	"os"
+	"sync"
 )
 
 func main() {
-
+	wg := sync.WaitGroup{}
 	commandLineSettings, err := cli.GetCommandLineSettings(os.Args[1:])
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-	watchMan := fileWatcher.NewWatchManager()
+	watcher := FolderWatcher.New()
 	paused := false
 
 	pauseChannel := make(chan bool)
@@ -24,7 +25,8 @@ func main() {
 
 	// add watchers from the command line
 	for _, folderPath := range commandLineSettings.FolderPaths {
-		if err := watchMan.AddFolder(folderPath, commandLineSettings.Recursive); err != nil {
+		// TODO the showHidden parameter is hard-coded
+		if err := watcher.AddFolder(folderPath, commandLineSettings.Recursive, false); err != nil {
 			// Just display the error and move on
 			cli.DisplayError(err)
 		}
@@ -35,38 +37,40 @@ func main() {
 		for {
 			select {
 
-			case event := <-watchMan.Watcher.Event:
+			case event := <-watcher.FileChanged:
 				// Print out the event to the screen.
 				if !paused {
 					cli.DisplayEvent(event)
 				}
-			case err := <-watchMan.Watcher.Error:
-				log.Fatalln(err)
-			case <-watchMan.Watcher.Closed:
+
+			case <-watcher.Stopped:
 				return
 
 			case p := <-pauseChannel:
-				paused = p
+				// React to changes in the paused status
+				if paused != p {
+					paused = p
+					cli.DisplayEventPause(paused)
+				}
 			case <-exitChannel:
-				ExitApplication(watchMan)
+				wg.Done()
+
 			}
 		}
 	}()
 
-	go cli.RunMenu(pauseChannel, exitChannel, watchMan)
+	go cli.RunMenu(pauseChannel, exitChannel, &watcher)
 
-	cli.DisplayWatchedFolderList(watchMan.FolderList)
+	cli.DisplayWatchedFolderList(watcher.RequestedWatches)
 	fmt.Println()
 
 	// Start the watcher
-	if err := watchMan.Start(); err != nil {
-		log.Fatalln(err)
-	}
+	wg.Add(1)
+	watcher.Start()
+
+	// Shut down
+	wg.Wait()
+	println("Shutting down the watcher")
+	watcher.Stop()
 }
 
-//Shut down the application
-func ExitApplication(watchMan *fileWatcher.WatchManager) {
-	println("Shutting down File Watcher")
-	watchMan.Close()
-	os.Exit(0)
-}
